@@ -12,11 +12,14 @@ services:
       start_period: 90s
       timeout: 3s
       interval: 15s
+    ports:
+      - "8000:8080"  # Bind container port 8080 to host port 8000
     volumes:
       - ./configuration:/etc/netbox/config:z,ro
       - netbox-media-files:/opt/netbox/netbox/media:rw
       - netbox-reports-files:/opt/netbox/netbox/reports:rw
       - netbox-scripts-files:/opt/netbox/netbox/scripts:rw
+
   netbox-worker:
     <<: *netbox
     depends_on:
@@ -31,6 +34,7 @@ services:
       start_period: 20s
       timeout: 3s
       interval: 15s
+
   netbox-housekeeping:
     <<: *netbox
     depends_on:
@@ -44,7 +48,6 @@ services:
       timeout: 3s
       interval: 15s
 
-  # postgres
   postgres:
     image: docker.io/postgres:16-alpine
     healthcheck:
@@ -57,7 +60,6 @@ services:
     volumes:
       - netbox-postgres-data:/var/lib/postgresql/data
 
-  # redis
   redis:
     image: docker.io/valkey/valkey:8.0-alpine
     command:
@@ -73,6 +75,7 @@ services:
     env_file: env/redis.env
     volumes:
       - netbox-redis-data:/data
+
   redis-cache:
     image: docker.io/valkey/valkey:8.0-alpine
     command:
